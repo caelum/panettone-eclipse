@@ -1,5 +1,9 @@
 package br.com.caelum.panettone.eclipse;
 
+import static java.util.Arrays.stream;
+
+import java.util.Arrays;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -11,6 +15,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+
+import br.com.caelum.vraptor.panettone.VRaptorCompiler;
 
 public class PanettoneNature implements IProjectNature {
 
@@ -44,19 +51,26 @@ public class PanettoneNature implements IProjectNature {
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
 		
-		IJavaProject javaProject = JavaCore.create(project);
-		IClasspathEntry[] entries = javaProject.getRawClasspath();
+		IJavaProject java = JavaCore.create(project);
 
+		prepare(project.getFolder(VRaptorCompiler.VIEW_OUTPUT));
+		prepare(project.getFolder(VRaptorCompiler.VIEW_INPUT));
+		
+		IPath srcPath= java.getPath().append(VRaptorCompiler.VIEW_OUTPUT);
+		addToClasspath(java, srcPath);
+	}
+
+	private void addToClasspath(IJavaProject java, IPath srcPath)
+			throws JavaModelException {
+		IClasspathEntry[] entries = java.getRawClasspath();
+		boolean isPresent = stream(entries).anyMatch(entry -> entry.getPath().equals(srcPath));
+		if(isPresent) return;
+		
 		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
 		System.arraycopy(entries, 0, newEntries, 0, entries.length);
-
-		IPath srcPath= javaProject.getPath().append("target/view-classes");
-		prepare(project.getFolder("target/view-classes"));
-		prepare(project.getFolder("src/main/view"));
 		IClasspathEntry srcEntry= JavaCore.newSourceEntry(srcPath, null);
-
 		newEntries[entries.length] = JavaCore.newSourceEntry(srcEntry.getPath());
-		javaProject.setRawClasspath(newEntries, null);
+		java.setRawClasspath(newEntries, null);
 	}
 
 	public void prepare(IFolder folder) throws CoreException {

@@ -1,13 +1,25 @@
-MINIMAL TODO
+NOW
+OK adding a panettone nature to a project should not automatically add target/view-classes if it already exists
 > when a file is removed, remove that file and nothing else. do not compile anything else
-> when a file is compiled, compile a single tone 
+- src/main/views
+> when a file is compiled, compile a single tone
+
+
+Eclipse:
 > automatically add popupmenu to add Panettone Nature to a project
-> adding a panettone nature to a project should not automatically add target/view-classes if it already exists
-> support .tone.*
-- make panettone support .tone.*
 - create your update site
-- add docs to panettone
 - allow custom imports
+- allow custom version of panettone jar (use the project's own file, if found)
+
+
+pANETTONE:
+- make panettone support .tone.*
+-- adde default imports such as javautil
+- add docs to panettone
+
+
+
+ 
 
 LATER
 > if there is an error in your template, show it there
