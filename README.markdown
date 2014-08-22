@@ -1,6 +1,4 @@
 NOW
-OK adding a panettone nature to a project should not automatically add target/view-classes if it already exists
-> when a file is removed, remove that file and nothing else. do not compile anything else
 - src/main/views
 > when a file is compiled, compile a single tone
 
