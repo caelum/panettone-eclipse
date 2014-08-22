@@ -1,8 +1,3 @@
-NOW
-- src/main/views
-> when a file is compiled, compile a single tone
-
-
 Eclipse:
 > automatically add popupmenu to add Panettone Nature to a project
 - create your update site

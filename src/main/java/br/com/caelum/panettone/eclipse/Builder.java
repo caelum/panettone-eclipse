@@ -1,6 +1,8 @@
 package br.com.caelum.panettone.eclipse;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -45,13 +47,15 @@ public class Builder {
 	private void compile(IFile file) {
 		deleteMarkers(file);
 		try {
-			List<Exception> errors = compiler.compileAndRetrieveErrors();
-			for (Exception ex : errors) {
-				addMarker(file, ex.getMessage(), 1, IMarker.SEVERITY_ERROR);
-			}
+			Optional<Exception> ex = compiler.compile(file.getLocation().toFile());
+			ex.ifPresent(e -> addCompilationMarker(file, e));
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			addCompilationMarker(file, e1);
 		}
+	}
+
+	private void addCompilationMarker(IFile file, Exception e) {
+		addMarker(file, e.getMessage(), 1, IMarker.SEVERITY_ERROR);
 	}
 
 	private void deleteMarkers(IFile file) {
