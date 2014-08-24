@@ -2,6 +2,8 @@ package br.com.caelum.panettone.eclipse.builder;
 
 import org.eclipse.core.resources.IFile;
 
+import br.com.caelum.panettone.eclipse.DynamicPanettone;
+
 public class Tone {
 
 	static boolean isTone(IFile file) {

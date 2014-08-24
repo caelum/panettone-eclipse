@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import br.com.caelum.panettone.eclipse.builder.DynamicPanettone;
 import br.com.caelum.panettone.eclipse.builder.PanettoneBuilder;
 
 public class PanettoneNature implements IProjectNature {

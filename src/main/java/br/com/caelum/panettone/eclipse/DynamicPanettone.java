@@ -1,4 +1,4 @@
-package br.com.caelum.panettone.eclipse.builder;
+package br.com.caelum.panettone.eclipse;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -17,6 +17,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+
+import br.com.caelum.panettone.eclipse.builder.Builder;
 
 public class DynamicPanettone {
 	
@@ -55,26 +57,16 @@ public class DynamicPanettone {
 			return Optional.empty();
 		}
 		try {
-			JarFinder jarFinder = new JarFinder();
+			JarFileLocator jarFinder = new JarFileLocator();
 			folder.accept(jarFinder);
-			return jarFinder.jar;
+			return jarFinder.getJar();
 		} catch (CoreException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	static class JarFinder implements IResourceVisitor {
-		Optional<IFile> jar = Optional.empty();
-
-		public boolean visit(IResource resource) throws CoreException {
-			if (resource.getName().contains("vraptor-panettone")) {
-				jar = Optional.of((IFile) resource);
-			}
-			return true;
-		}
-	};
-
 	@SuppressWarnings({ "rawtypes" })
+	public
 	static Object invokeOnCompiler(IProject project, String method, Class[] types,
 			Object... args) {
 		URI projectPath = project.getLocationURI();

@@ -10,6 +10,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
+import br.com.caelum.panettone.eclipse.DynamicPanettone;
+
 public class Builder {
 
 	private final IProject project;
