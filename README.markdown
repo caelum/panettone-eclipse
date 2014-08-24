@@ -1,13 +1,14 @@
 Eclipse:
-1. automatically add popupmenu to add Panettone Nature to a project
 4. create your update site
 
 pANETTONE:
-2. plugin automatically download jar if not yet present
-3. doc explaining plugin
+1. plugin automatically download jar if not yet present
+2. doc explaining plugin
+3. todos os casos de exception mostrar um marker ao inves de jogar a exception
 
 LATER:
 - removing a tone.html is not deleting the java file
 - project clean is not deleting everything
 private final static Runnable EMPTY = () -> {};      E      <%@ Runnable body = EMPTY %> 
-plugin: todos os casos de exception mostrar um marker ao inves de jogar a exception
+- cache panettone instance after instantiated. allow the user to refresh it
+1. automatically add popupmenu to add Panettone Nature to a project

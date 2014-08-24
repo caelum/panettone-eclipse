@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 public class DynamicPanettone {
-
+	
 	@SuppressWarnings("resource")
 	private static Class<?> loadType(IProject project) {
 		try {
