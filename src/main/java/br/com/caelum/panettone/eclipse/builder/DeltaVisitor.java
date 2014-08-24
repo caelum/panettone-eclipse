@@ -7,10 +7,14 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
+interface CoreConsumer<T> {
+	void accept(T f) throws CoreException;
+}
 class DeltaVisitor implements IResourceDeltaVisitor {
-	private final Consumer<IFile> remove, compile;
+	private final CoreConsumer<IFile> remove;
+	private final Consumer<IFile> compile;
 
-	DeltaVisitor(Consumer<IFile> remove, Consumer<IFile> compile) {
+	DeltaVisitor(CoreConsumer<IFile> remove, Consumer<IFile> compile) {
 		this.remove = remove;
 		this.compile = compile;
 	}
@@ -26,7 +30,7 @@ class DeltaVisitor implements IResourceDeltaVisitor {
 		return true;
 	}
 
-	private void dealWith(IResourceDelta delta, IFile file) {
+	private void dealWith(IResourceDelta delta, IFile file) throws CoreException {
 		switch (delta.getKind()) {
 		case IResourceDelta.REMOVED:
 			remove.accept(file);

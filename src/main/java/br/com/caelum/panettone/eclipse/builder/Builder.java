@@ -4,20 +4,21 @@ import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 import br.com.caelum.panettone.eclipse.PanettoneProject;
+import br.com.caelum.panettone.eclipse.ToneMarkers;
 
 public class Builder {
 
 	private final IProject project;
+	private final PanettoneProject tone;
 
 	public Builder(IProject project) {
 		this.project = project;
+		this.tone = new PanettoneProject(project);
 	}
 	
 	void full() throws CoreException {
@@ -30,49 +31,23 @@ public class Builder {
 	}
 
 	private void clear() throws CoreException {
-		project.deleteMarkers(TONE_PROBLEM, true, IResource.DEPTH_INFINITE);
+		new ToneMarkers().clear(project);
 	}
 
-	private void remove(IFile file) {
-		new PanettoneProject(project).invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
+	private void remove(IFile file) throws CoreException {
+		tone.invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
 	}
 
 	@SuppressWarnings("unchecked")
 	private void compile(IFile file) {
-		deleteMarkers(file);
+		new ToneMarkers().removeMarkersFor(file);
+		PanettoneProject tone = new PanettoneProject(project);
+		if(!tone.isEnabled()) return;
 		try {
-			Optional<Exception> ex = (Optional<Exception>) new PanettoneProject(project).invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
-			ex.ifPresent(e -> addCompilationMarker(file, e));
+			Optional<Exception> ex = (Optional<Exception>) tone.invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
+			ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
 		} catch (Exception e1) {
-			addCompilationMarker(file, e1);
+			new ToneMarkers().addCompilationMarker(file, e1);
 		}
 	}
-
-	private void addCompilationMarker(IFile file, Exception e) {
-		addMarker(file, e.getMessage(), 1, IMarker.SEVERITY_ERROR);
-	}
-
-	private void deleteMarkers(IFile file) {
-		try {
-			file.deleteMarkers(TONE_PROBLEM, false, IResource.DEPTH_ZERO);
-		} catch (CoreException ce) {
-		}
-	}
-
-	private static final String TONE_PROBLEM = "panettone-eclipse.toneProblem";
-
-	private void addMarker(IFile file, String message, int lineNumber,
-			int severity) {
-		try {
-			IMarker marker = file.createMarker(TONE_PROBLEM);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-			if (lineNumber == -1) {
-				lineNumber = 1;
-			}
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-		} catch (CoreException e) {
-		}
-	}
-
 }

@@ -45,14 +45,15 @@ public class PanettoneNature implements IProjectNature {
 		IJavaProject java = JavaCore.create(project);
 
 		PanettoneProject tone = new PanettoneProject(project);
-		tone.prepareFolders();
-		
-		IPath srcPath= java.getPath().append(constant("VIEW_OUTPUT"));
-		addToClasspath(java, srcPath);
-	}
-
-	private String constant(String name) {
-		return new PanettoneProject(getProject()).constantValue(name);
+		try {
+			tone.prepareFolders();
+			if(tone.isEnabled()) {
+				IPath srcPath= java.getPath().append(tone.getViewOutput());
+				addToClasspath(java, srcPath);
+			}
+		} catch (Exception e) {
+			tone.markAsDisabled();
+		}
 	}
 
 	private void addToClasspath(IJavaProject java, IPath srcPath)

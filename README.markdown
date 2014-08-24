@@ -20,3 +20,5 @@ Feel free to update it at `src/build/lib`
 
 PANETTONE:
 2. todos os casos de exception mostrar um marker ao inves de jogar a exception
+	> cria o projeto, mostrar o erro
+	> copiou o arquivo arquivo, sumir o erro
