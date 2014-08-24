@@ -29,7 +29,7 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 				builder.incremental(delta);
 			}
 		}
-		getProject().getFolder(Builder.constantValue(getProject(),"VIEW_OUTPUT"))
+		getProject().getFolder(DynamicPanettone.constantValue(getProject(),"VIEW_OUTPUT"))
 				.refreshLocal(DEPTH_INFINITE, monitor);
 		return null;
 	}

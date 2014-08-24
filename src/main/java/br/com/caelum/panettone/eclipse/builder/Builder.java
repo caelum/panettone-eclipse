@@ -1,14 +1,6 @@
 package br.com.caelum.panettone.eclipse.builder;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
@@ -40,60 +32,14 @@ public class Builder {
 	}
 
 	private void remove(IFile file) {
-		invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
-	}
-
-	@SuppressWarnings({ "rawtypes" })
-	private Object invokeOnCompiler(String method, Class[] types,
-			Object... args) {
-		URI projectPath = project.getLocationURI();
-		Class<?> type = loadType(project);
-		File baseDir = new File(projectPath);
-		try {
-			Constructor<?> constructor = type.getDeclaredConstructor(File.class, List.class);
-			Object compiler = constructor.newInstance(baseDir, new ArrayList<>());
-			Method m = type.getDeclaredMethod(method, types);
-			return m.invoke(compiler, args);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@SuppressWarnings({ "deprecation", "resource" })
-	private static Class<?> loadType(IProject project) {
-		try {
-			Optional<IFile> jar = findProjectPanettone(project);
-			if(!jar.isPresent()) {
-				throw new RuntimeException("Unable to find panettone on your src/build/libs.");
-			}
-			URL url = jar.get().getFullPath().toFile().toURL();
-			ClassLoader parent = Builder.class.getClassLoader();
-			URLClassLoader loader = new URLClassLoader(new URL[]{url}, parent);
-			Class<?> type = (Class<?>) loader.loadClass("br.com.caelum.vraptor.panettone.VRaptorCompiler");
-			return type;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	public static String constantValue(IProject project, String name) {
-		try {
-			Field field = loadType(project).getDeclaredField(name);
-			return (String) field.get(null);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static Optional<IFile> findProjectPanettone(IProject project) {
-		return Optional.empty();
+		DynamicPanettone.invokeOnCompiler(project, "removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
 	}
 
 	@SuppressWarnings("unchecked")
 	private void compile(IFile file) {
 		deleteMarkers(file);
 		try {
-			Optional<Exception> ex = (Optional<Exception>) invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
+			Optional<Exception> ex = (Optional<Exception>) DynamicPanettone.invokeOnCompiler(file.getProject(), "compile", new Class[]{File.class}, file.getLocation().toFile()); 
 			ex.ifPresent(e -> addCompilationMarker(file, e));
 		} catch (Exception e1) {
 			addCompilationMarker(file, e1);

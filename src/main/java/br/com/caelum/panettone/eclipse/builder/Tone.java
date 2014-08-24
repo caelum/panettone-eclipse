@@ -10,7 +10,7 @@ public class Tone {
 
 	static boolean onPath(IFile file) {
 		return file.getProjectRelativePath().toString()
-				.startsWith(Builder.constantValue(file.getProject(), "VIEW_INPUT"));
+				.startsWith(DynamicPanettone.constantValue(file.getProject(), "VIEW_INPUT"));
 	}
 
 	static boolean isToneExtension(IFile file) {

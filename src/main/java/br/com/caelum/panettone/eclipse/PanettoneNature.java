@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import br.com.caelum.panettone.eclipse.builder.Builder;
+import br.com.caelum.panettone.eclipse.builder.DynamicPanettone;
 import br.com.caelum.panettone.eclipse.builder.PanettoneBuilder;
 
 public class PanettoneNature implements IProjectNature {
@@ -60,7 +60,7 @@ public class PanettoneNature implements IProjectNature {
 	}
 
 	private String constant(String name) {
-		return Builder.constantValue(getProject(), name);
+		return DynamicPanettone.constantValue(getProject(), name);
 	}
 
 	private void addToClasspath(IJavaProject java, IPath srcPath)
