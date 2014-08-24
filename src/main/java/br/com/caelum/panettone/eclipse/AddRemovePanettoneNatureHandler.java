@@ -1,6 +1,7 @@
 package br.com.caelum.panettone.eclipse;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -15,28 +16,19 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class AddRemovePanettoneNatureHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		// TODO Auto-generated method stub
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		//
-		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
-				Object element = it.next();
-				IProject project = null;
-				if (element instanceof IProject) {
-					project = (IProject) element;
-				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
-							.getAdapter(IProject.class);
-				}
-				if (project != null) {
-					try {
-						new PanettoneProject(project).toggleNature();
-					} catch (CoreException e) {
-						//TODO log something
-						throw new ExecutionException("Failed to toggle nature",
-								e);
-					}
+		if (!(selection instanceof IStructuredSelection))
+			return null;
+
+		IStructuredSelection structured = (IStructuredSelection) selection;
+		for (Iterator<?> it = structured.iterator(); it.hasNext();) {
+			Object element = it.next();
+			Optional<IProject> project = projectFor(element);
+			if (project.isPresent()) {
+				try {
+					new PrePanettoneProject(project.get()).toggleNature();
+				} catch (CoreException e) {
+					throw new ExecutionException("Failed to toggle nature", e);
 				}
 			}
 		}
@@ -44,5 +36,15 @@ public class AddRemovePanettoneNatureHandler extends AbstractHandler {
 		return null;
 	}
 
+	private Optional<IProject> projectFor(Object element) {
+		if (element instanceof IProject) {
+			return Optional.of((IProject) element);
+		}
+		if (element instanceof IAdaptable) {
+			return Optional.of((IProject) ((IAdaptable) element)
+					.getAdapter(IProject.class));
+		}
+		return null;
+	}
 
 }
