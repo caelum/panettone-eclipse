@@ -2,7 +2,7 @@ package br.com.caelum.panettone.eclipse.builder;
 
 import org.eclipse.core.resources.IFile;
 
-import br.com.caelum.panettone.eclipse.DynamicPanettone;
+import br.com.caelum.panettone.eclipse.PanettoneProject;
 
 public class Tone {
 
@@ -12,7 +12,7 @@ public class Tone {
 
 	static boolean onPath(IFile file) {
 		return file.getProjectRelativePath().toString()
-				.startsWith(DynamicPanettone.constantValue(file.getProject(), "VIEW_INPUT"));
+				.startsWith(new PanettoneProject(file.getProject()).getViewInput());
 	}
 
 	static boolean isToneExtension(IFile file) {

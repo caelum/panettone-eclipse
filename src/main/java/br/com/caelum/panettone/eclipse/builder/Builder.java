@@ -10,7 +10,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
-import br.com.caelum.panettone.eclipse.DynamicPanettone;
+import br.com.caelum.panettone.eclipse.PanettoneProject;
 
 public class Builder {
 
@@ -34,14 +34,14 @@ public class Builder {
 	}
 
 	private void remove(IFile file) {
-		DynamicPanettone.invokeOnCompiler(project, "removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
+		new PanettoneProject(project).invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
 	}
 
 	@SuppressWarnings("unchecked")
 	private void compile(IFile file) {
 		deleteMarkers(file);
 		try {
-			Optional<Exception> ex = (Optional<Exception>) DynamicPanettone.invokeOnCompiler(file.getProject(), "compile", new Class[]{File.class}, file.getLocation().toFile()); 
+			Optional<Exception> ex = (Optional<Exception>) new PanettoneProject(project).invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
 			ex.ifPresent(e -> addCompilationMarker(file, e));
 		} catch (Exception e1) {
 			addCompilationMarker(file, e1);

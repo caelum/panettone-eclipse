@@ -59,7 +59,7 @@ public class PanettoneNature implements IProjectNature {
 	}
 
 	private String constant(String name) {
-		return DynamicPanettone.constantValue(getProject(), name);
+		return new PanettoneProject(getProject()).constantValue(name);
 	}
 
 	private void addToClasspath(IJavaProject java, IPath srcPath)

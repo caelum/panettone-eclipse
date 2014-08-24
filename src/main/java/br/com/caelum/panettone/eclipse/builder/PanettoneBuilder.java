@@ -10,7 +10,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import br.com.caelum.panettone.eclipse.DynamicPanettone;
+import br.com.caelum.panettone.eclipse.PanettoneProject;
 
 public class PanettoneBuilder extends IncrementalProjectBuilder {
 
@@ -31,7 +31,7 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 				builder.incremental(delta);
 			}
 		}
-		getProject().getFolder(DynamicPanettone.constantValue(getProject(),"VIEW_OUTPUT"))
+		getProject().getFolder(new PanettoneProject(getProject()).getViewOutput())
 				.refreshLocal(DEPTH_INFINITE, monitor);
 		return null;
 	}
