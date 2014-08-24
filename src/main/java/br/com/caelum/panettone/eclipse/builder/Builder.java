@@ -1,8 +1,13 @@
 package br.com.caelum.panettone.eclipse.builder;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
@@ -16,20 +21,12 @@ import br.com.caelum.vraptor.panettone.VRaptorCompiler;
 
 public class Builder {
 
-	private final VRaptorCompiler compiler;
 	private final IProject project;
 
 	public Builder(IProject project) {
 		this.project = project;
-		this.compiler = getCompiler(project);
 	}
 	
-	private static VRaptorCompiler getCompiler(IProject project) {
-		URI projectPath = project.getLocationURI();
-		File baseDir = new File(projectPath);
-		return new VRaptorCompiler(baseDir, new ArrayList<>());
-	}
-
 	void full() throws CoreException {
 		clear();
 		project.accept(new VisitToners(this::compile));
@@ -44,13 +41,41 @@ public class Builder {
 	}
 
 	private void remove(IFile file) {
-		compiler.removeJavaVersionOf(file.getFullPath().toPortableString());
+		invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
 	}
 
+	@SuppressWarnings({ "rawtypes", "deprecation", "resource", "unchecked" })
+	private Object invokeOnCompiler(String method, Class[] types,
+			Object... args) {
+		URI projectPath = project.getLocationURI();
+		File baseDir = new File(projectPath);
+		Optional<IFile> project = findProjectPanettone();
+		if(!project.isPresent()) {
+			throw new RuntimeException("Unable to find panettone on your src/build/libs.");
+		}
+		try {
+			URL url = project.get().getFullPath().toFile().toURL();
+			ClassLoader parent = getClass().getClassLoader();
+			URLClassLoader loader = new URLClassLoader(new URL[]{url}, parent);
+			Class<?> type = (Class<VRaptorCompiler>) loader.loadClass("br.com.caelum.vraptor.panettone.VRaptorCompiler");
+			Constructor<?> constructor = type.getDeclaredConstructor(File.class, List.class);
+			Object compiler = constructor.newInstance(baseDir, new ArrayList<>());
+			Method m = type.getDeclaredMethod(method, types);
+			return m.invoke(compiler, args);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Optional<IFile> findProjectPanettone() {
+		return Optional.empty();
+	}
+
+	@SuppressWarnings("unchecked")
 	private void compile(IFile file) {
 		deleteMarkers(file);
 		try {
-			Optional<Exception> ex = compiler.compile(file.getLocation().toFile());
+			Optional<Exception> ex = (Optional<Exception>) invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
 			ex.ifPresent(e -> addCompilationMarker(file, e));
 		} catch (Exception e1) {
 			addCompilationMarker(file, e1);
