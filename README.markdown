@@ -16,9 +16,3 @@ Use our update site:
 
 1. I want to use another panettone release
 Feel free to update it at `src/build/lib`
-
-
-PANETTONE:
-2. todos os casos de exception mostrar um marker ao inves de jogar a exception
-	> cria o projeto, mostrar o erro
-	> copiou o arquivo arquivo, sumir o erro
