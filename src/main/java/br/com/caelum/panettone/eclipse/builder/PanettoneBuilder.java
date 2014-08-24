@@ -10,8 +10,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import br.com.caelum.vraptor.panettone.VRaptorCompiler;
-
 public class PanettoneBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = "panettone-eclipse.panettoneBuilder";
@@ -31,7 +29,7 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 				builder.incremental(delta);
 			}
 		}
-		getProject().getFolder(VRaptorCompiler.VIEW_OUTPUT)
+		getProject().getFolder(Builder.constantValue(getProject(),"VIEW_OUTPUT"))
 				.refreshLocal(DEPTH_INFINITE, monitor);
 		return null;
 	}

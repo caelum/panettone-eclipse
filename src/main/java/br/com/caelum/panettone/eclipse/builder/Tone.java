@@ -2,8 +2,6 @@ package br.com.caelum.panettone.eclipse.builder;
 
 import org.eclipse.core.resources.IFile;
 
-import br.com.caelum.vraptor.panettone.VRaptorCompiler;
-
 public class Tone {
 
 	static boolean isTone(IFile file) {
@@ -12,7 +10,7 @@ public class Tone {
 
 	static boolean onPath(IFile file) {
 		return file.getProjectRelativePath().toString()
-				.startsWith(VRaptorCompiler.VIEW_INPUT);
+				.startsWith(Builder.constantValue(file.getProject(), "VIEW_INPUT"));
 	}
 
 	static boolean isToneExtension(IFile file) {

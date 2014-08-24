@@ -2,8 +2,6 @@ package br.com.caelum.panettone.eclipse;
 
 import static java.util.Arrays.stream;
 
-import java.util.Arrays;
-
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -17,8 +15,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import br.com.caelum.panettone.eclipse.builder.Builder;
 import br.com.caelum.panettone.eclipse.builder.PanettoneBuilder;
-import br.com.caelum.vraptor.panettone.VRaptorCompiler;
 
 public class PanettoneNature implements IProjectNature {
 
@@ -54,11 +52,15 @@ public class PanettoneNature implements IProjectNature {
 		
 		IJavaProject java = JavaCore.create(project);
 
-		prepare(project.getFolder(VRaptorCompiler.VIEW_OUTPUT));
-		prepare(project.getFolder(VRaptorCompiler.VIEW_INPUT));
+		prepare(project.getFolder(constant("VIEW_OUTPUT")));
+		prepare(project.getFolder(constant("VIEW_INPUT")));
 		
-		IPath srcPath= java.getPath().append(VRaptorCompiler.VIEW_OUTPUT);
+		IPath srcPath= java.getPath().append(constant("VIEW_OUTPUT"));
 		addToClasspath(java, srcPath);
+	}
+
+	private String constant(String name) {
+		return Builder.constantValue(getProject(), name);
 	}
 
 	private void addToClasspath(IJavaProject java, IPath srcPath)
