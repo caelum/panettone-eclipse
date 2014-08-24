@@ -6,3 +6,8 @@ Eclipse:
 
 pANETTONE:
 - doc explaining plugin
+- removing a tone.html is not deleting the java file
+
+LATER:
+- project clean is not deleting everything
+private final static Runnable EMPTY = () -> {};      E      <%@ Runnable body = EMPTY %> 

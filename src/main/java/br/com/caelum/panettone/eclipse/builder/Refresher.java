@@ -1,4 +1,4 @@
-package br.com.caelum.panettone.eclipse;
+package br.com.caelum.panettone.eclipse.builder;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

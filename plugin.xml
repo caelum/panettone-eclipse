@@ -9,7 +9,7 @@
       <builder
             hasNature="true">
          <run
-               class="br.com.caelum.panettone.eclipse.PanettoneBuilder">
+               class="br.com.caelum.panettone.eclipse.builder.PanettoneBuilder">
          </run>
       </builder>
    </extension>

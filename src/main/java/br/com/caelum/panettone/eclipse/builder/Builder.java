@@ -1,4 +1,4 @@
-package br.com.caelum.panettone.eclipse;
+package br.com.caelum.panettone.eclipse.builder;
 
 import java.io.File;
 import java.util.List;
