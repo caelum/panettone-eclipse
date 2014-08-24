@@ -30,7 +30,7 @@ public class Builder {
 	}
 
 	private void clear() throws CoreException {
-		project.deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
+		project.deleteMarkers(TONE_PROBLEM, true, IResource.DEPTH_INFINITE);
 	}
 
 	private void remove(IFile file) {
@@ -54,17 +54,17 @@ public class Builder {
 
 	private void deleteMarkers(IFile file) {
 		try {
-			file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
+			file.deleteMarkers(TONE_PROBLEM, false, IResource.DEPTH_ZERO);
 		} catch (CoreException ce) {
 		}
 	}
 
-	private static final String MARKER_TYPE = "panettone-eclipse.toneProblem";
+	private static final String TONE_PROBLEM = "panettone-eclipse.toneProblem";
 
 	private void addMarker(IFile file, String message, int lineNumber,
 			int severity) {
 		try {
-			IMarker marker = file.createMarker(MARKER_TYPE);
+			IMarker marker = file.createMarker(TONE_PROBLEM);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			if (lineNumber == -1) {

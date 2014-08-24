@@ -1,6 +1,7 @@
 package br.com.caelum.panettone.eclipse;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,16 +13,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import br.com.caelum.panettone.eclipse.builder.Builder;
 
 public class PanettoneProject {
 
+	private static final String PANETTONE_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/1.0.0/vraptor-panettone-1.0.0.jar";
+	private static final String VRAPTOR_COMPILER = "br.com.caelum.vraptor.panettone.VRaptorCompiler";
+	private static final String SRC_BUILD_LIB = "src/build/lib";
 	private final IProject project;
 
 	public PanettoneProject(IProject project) {
@@ -37,8 +43,8 @@ public class PanettoneProject {
 	}
 
 	private String[] naturesFor(String[] natures) {
-		boolean isPresent = Arrays.asList(natures)
-				.contains(PanettoneNature.NATURE_ID);
+		boolean isPresent = Arrays.asList(natures).contains(
+				PanettoneNature.NATURE_ID);
 		if (isPresent) {
 			return removeNatureFrom(natures);
 		}
@@ -58,28 +64,41 @@ public class PanettoneProject {
 				.toArray(String[]::new);
 		return newNatures;
 	}
-	
+
 	@SuppressWarnings("resource")
-	private Class<?> loadType() {
+	private Class<?> loadType(IProgressMonitor monitor) {
 		Optional<IFile> jar = findProjectPanettone();
 		try {
-			if (!jar.isPresent()) {
-				throw new RuntimeException(
-						"Unable to find panettone on your src/build/libs.");
-			}
-			URL url = jar.get().getLocationURI().toURL();
+			IFile file = jar.orElseGet(() -> downloadJarFile(monitor));
+			URL url = file.getLocationURI().toURL();
 			ClassLoader parent = Builder.class.getClassLoader();
 			URLClassLoader loader = new URLClassLoader(new URL[] { url },
 					parent);
 			return (Class<?>) loader
-					.loadClass("br.com.caelum.vraptor.panettone.VRaptorCompiler");
+					.loadClass(VRAPTOR_COMPILER);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	private IFile downloadJarFile(IProgressMonitor monitor) {
+		try {
+			URL website = new URL(PANETTONE_JAR);
+			IFolder folder = project.getFolder(SRC_BUILD_LIB);
+			IFile file = folder.getFile("vraptor-panettone-1.0.0.jar");
+			if(file.exists()) {
+				file.setContents(website.openStream(), IFile.KEEP_HISTORY | IFile.FORCE, monitor);
+			} else {
+				file.create(website.openStream(), IFile.FORCE, monitor);
+			}
+			return file;
+		} catch (IOException | CoreException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public String constantValue(String name) {
-		Class<?> type = loadType();
+		Class<?> type = loadType(null);
 		try {
 			Field field = type.getDeclaredField(name);
 			return (String) field.get(null);
@@ -89,10 +108,7 @@ public class PanettoneProject {
 	}
 
 	private Optional<IFile> findProjectPanettone() {
-		IFolder folder = project.getFolder("src/build/lib");
-		if (!folder.exists()) {
-			return Optional.empty();
-		}
+		IFolder folder = project.getFolder(SRC_BUILD_LIB);
 		try {
 			JarFileLocator jarFinder = new JarFileLocator();
 			folder.accept(jarFinder);
@@ -103,10 +119,9 @@ public class PanettoneProject {
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public Object invokeOnCompiler(String method, Class[] types,
-			Object... args) {
+	public Object invokeOnCompiler(String method, Class[] types, Object... args) {
 		URI projectPath = project.getLocationURI();
-		Class<?> type = loadType();
+		Class<?> type = loadType(null);
 		File baseDir = new File(projectPath);
 		try {
 			Constructor<?> constructor = type.getDeclaredConstructor(
@@ -126,6 +141,21 @@ public class PanettoneProject {
 
 	public String getViewInput() {
 		return constantValue("VIEW_INPUT");
+	}
+
+	public void prepareFolders() throws CoreException {
+		prepare(project.getFolder(SRC_BUILD_LIB));
+		prepare(project.getFolder(getViewOutput()));
+		prepare(project.getFolder(getViewInput()));
+	}
+
+	public void prepare(IFolder folder) throws CoreException {
+		if (folder.exists())
+			return;
+		IContainer parent = folder.getParent();
+		if (parent instanceof IFolder)
+			prepare((IFolder) parent);
+		folder.create(false, false, null);
 	}
 
 }

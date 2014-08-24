@@ -3,8 +3,6 @@ package br.com.caelum.panettone.eclipse;
 import static java.util.Arrays.stream;
 
 import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
@@ -26,11 +24,6 @@ public class PanettoneNature implements IProjectNature {
 
 	private IProject project;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#configure()
-	 */
 	public void configure() throws CoreException {
 		IProjectDescription desc = project.getDescription();
 		ICommand[] commands = desc.getBuildSpec();
@@ -51,8 +44,8 @@ public class PanettoneNature implements IProjectNature {
 		
 		IJavaProject java = JavaCore.create(project);
 
-		prepare(project.getFolder(constant("VIEW_OUTPUT")));
-		prepare(project.getFolder(constant("VIEW_INPUT")));
+		PanettoneProject tone = new PanettoneProject(project);
+		tone.prepareFolders();
 		
 		IPath srcPath= java.getPath().append(constant("VIEW_OUTPUT"));
 		addToClasspath(java, srcPath);
@@ -75,21 +68,6 @@ public class PanettoneNature implements IProjectNature {
 		java.setRawClasspath(newEntries, null);
 	}
 
-	public void prepare(IFolder folder) throws CoreException {
-	    if (!folder.exists()) {
-	        IContainer parent = folder.getParent();
-	        if(parent instanceof IFolder)
-	        		prepare((IFolder) parent);
-	        folder.create(false, false, null);
-	    }
-	}
-
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
-	 */
 	public void deconfigure() throws CoreException {
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
@@ -106,11 +84,6 @@ public class PanettoneNature implements IProjectNature {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#getProject()
-	 */
 	public IProject getProject() {
 		return project;
 	}
