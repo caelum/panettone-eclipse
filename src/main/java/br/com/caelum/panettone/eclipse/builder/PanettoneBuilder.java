@@ -1,8 +1,7 @@
 package br.com.caelum.panettone.eclipse.builder;
 
-import java.io.File;
-import java.net.URI;
-import java.util.Arrays;
+import static org.eclipse.core.resources.IResource.DEPTH_INFINITE;
+
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -17,9 +16,10 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = "panettone-eclipse.panettoneBuilder";
 
+	@SuppressWarnings("rawtypes")
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
 			throws CoreException {
-		Builder builder = getBuilder(monitor);
+		Builder builder = new Builder(getProject());
 
 		if (kind == FULL_BUILD) {
 			builder.full();
@@ -31,22 +31,9 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 				builder.incremental(delta);
 			}
 		}
-		new Refresher(getProject()).all(monitor);
+		getProject().getFolder(VRaptorCompiler.VIEW_OUTPUT)
+				.refreshLocal(DEPTH_INFINITE, monitor);
 		return null;
-	}
-
-	private Builder getBuilder(IProgressMonitor monitor) {
-		VRaptorCompiler compiler = getCompiler();
-		Builder builder = new Builder(getProject(), monitor, compiler);
-		return builder;
-	}
-
-	private VRaptorCompiler getCompiler() {
-		URI projectPath = getProject().getLocationURI();
-		File baseDir = new File(projectPath);
-		VRaptorCompiler compiler = new VRaptorCompiler(baseDir,
-				Arrays.asList("java.util.*"));
-		return compiler;
 	}
 
 }

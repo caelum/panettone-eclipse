@@ -1,7 +1,8 @@
 package br.com.caelum.panettone.eclipse.builder;
 
 import java.io.File;
-import java.util.List;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
@@ -10,7 +11,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import br.com.caelum.vraptor.panettone.VRaptorCompiler;
 
@@ -18,13 +18,16 @@ public class Builder {
 
 	private final VRaptorCompiler compiler;
 	private final IProject project;
-	private final IProgressMonitor monitor;
 
-	public Builder(IProject project, IProgressMonitor monitor,
-			VRaptorCompiler compiler) {
+	public Builder(IProject project) {
 		this.project = project;
-		this.monitor = monitor;
-		this.compiler = compiler;
+		this.compiler = getCompiler(project);
+	}
+	
+	private static VRaptorCompiler getCompiler(IProject project) {
+		URI projectPath = project.getLocationURI();
+		File baseDir = new File(projectPath);
+		return new VRaptorCompiler(baseDir, new ArrayList<>());
 	}
 
 	void full() throws CoreException {
