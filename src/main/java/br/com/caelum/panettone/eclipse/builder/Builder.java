@@ -35,7 +35,7 @@ public class Builder {
 	}
 
 	private void remove(IFile file) throws CoreException {
-		tone.invokeOnCompiler("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
+		tone.invokeOnTone("removeJavaVersionOf", new Class[]{String.class}, file.getFullPath().toPortableString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class Builder {
 		new ToneMarkers().removeMarkersFor(file);
 		PanettoneProject tone = new PanettoneProject(project);
 		try {
-			Optional<Exception> ex = (Optional<Exception>) tone.invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
+			Optional<Exception> ex = (Optional<Exception>) tone.invokeOnTone("compile", new Class[]{File.class}, file.getLocation().toFile()); 
 			ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
 		} catch (Exception e1) {
 			new ToneMarkers().addCompilationMarker(file, e1);

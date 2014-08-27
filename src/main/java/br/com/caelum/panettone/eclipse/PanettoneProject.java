@@ -8,8 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -25,10 +23,15 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import br.com.caelum.panettone.eclipse.loader.DynamicLibrary;
 
+@SuppressWarnings({ "rawtypes" })
 public class PanettoneProject {
 
 	public static final String TONE_OUTPUT = "target/views-classes";
 	public static final String TONE_INPUT = "src/main/views";
+
+	public static final String CUTTI_OUTPUT = "target/i18n-classes";
+	public static final String CUTTI_INPUT = "src/main/resources";
+	
 	private static final String PANETTONE_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/1.0.0/vraptor-panettone-1.0.0.jar";
 	private static final String PANETTONE_TYPE = "br.com.caelum.vraptor.panettone.VRaptorCompiler";
 	public static final String SRC_BUILD_LIB = "src/build/lib";
@@ -38,25 +41,30 @@ public class PanettoneProject {
 
 	private final IProject project;
 	private final ToneMarkers markers = new ToneMarkers();
-	private final DynamicLibrary panettoneCooker;
-	private final DynamicLibrary biscuttiCooker;
+	private final DynamicLibrary toneCooker;
+	private final DynamicLibrary cuttiCooker;
 
 	public PanettoneProject(IProject project) {
 		this.project = project;
-		this.panettoneCooker = new DynamicLibrary(project, PANETTONE_JAR, PANETTONE_TYPE);
-		this.biscuttiCooker = new DynamicLibrary(project, BISCUTTI_JAR, BISCUTTI_TYPE);
+		this.toneCooker = new DynamicLibrary(project, PANETTONE_JAR, PANETTONE_TYPE);
+		this.cuttiCooker = new DynamicLibrary(project, BISCUTTI_JAR, BISCUTTI_TYPE);
 	}
 
-	@SuppressWarnings({ "rawtypes" })
-	public Object invokeOnCompiler(String method, Class[] types, Object... args) throws CoreException {
+	public Object invokeOnTone(String method, Class[] types, Object... args) throws CoreException {
+		return invoke(method, types, getTone(), args);
+	}
+
+	public Object invokeOnCutti(String method, Class[] types, Object... args) throws CoreException {
+		return invoke(method, types, getCutti(), args);
+	}
+
+	private Object invoke(String method, Class[] types, Class<?> type,
+			Object... args) throws CoreException {
 		URI projectPath = project.getLocationURI();
 		try {
-			Class<?> type = panettoneCooker.loadType(null);
 			File baseDir = new File(projectPath);
-			Constructor<?> constructor = type.getDeclaredConstructor(
-					File.class, List.class);
-			Object compiler = constructor.newInstance(baseDir,
-					new ArrayList<>());
+			Constructor<?> constructor = type.getDeclaredConstructor(File.class);
+			Object compiler = constructor.newInstance(baseDir);
 			Method m = type.getDeclaredMethod(method, types);
 			return m.invoke(compiler, args);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -64,20 +72,31 @@ public class PanettoneProject {
 		}
 	}
 
+	private Class<?> getTone() throws CoreException {
+		return toneCooker.loadType(null);
+	}
+
+	private Class<?> getCutti() throws CoreException {
+		return cuttiCooker.loadType(null);
+	}
+
 	public void prepareFolders() {
 		try {
 			mkDirs(project.getFolder(SRC_BUILD_LIB));
+			mkDirs(project.getFolder(CUTTI_INPUT));
+			mkDirs(project.getFolder(CUTTI_OUTPUT));
 			mkDirs(project.getFolder(TONE_INPUT));
 			mkDirs(project.getFolder(TONE_OUTPUT));
-			prepareClasspath();
+			prepareClasspath(TONE_OUTPUT);
+			prepareClasspath(CUTTI_OUTPUT);
 		} catch (Exception e) {
 			markAsDisabled();
 		}
 	}
 
-	private void prepareClasspath() throws JavaModelException {
+	private void prepareClasspath(String folder) throws JavaModelException {
 		IJavaProject java = JavaCore.create(project);
-		IPath srcPath = java.getPath().append(PanettoneProject.TONE_OUTPUT);
+		IPath srcPath = java.getPath().append(folder);
 		addToClasspath(java, srcPath);
 	}
 
@@ -101,7 +120,9 @@ public class PanettoneProject {
 	private void addToClasspath(IJavaProject java, IPath srcPath)
 			throws JavaModelException {
 		IClasspathEntry[] entries = java.getRawClasspath();
-		boolean isPresent = stream(entries).anyMatch(entry -> entry.getPath().equals(srcPath));
+		boolean isPresent = stream(entries)
+								.map(e -> e.getPath())
+								.anyMatch(srcPath::equals);
 		if(isPresent) return;
 		
 		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
