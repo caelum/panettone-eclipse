@@ -8,6 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -26,7 +28,7 @@ import br.com.caelum.panettone.eclipse.loader.DynamicLibrary;
 @SuppressWarnings({ "rawtypes" })
 public class PanettoneProject {
 
-	public static final String TONE_OUTPUT = "target/views-classes";
+	public static final String TONE_OUTPUT = "target/view-classes";
 	public static final String TONE_INPUT = "src/main/views";
 
 	public static final String COTTI_OUTPUT = "target/i18n-classes";
@@ -62,13 +64,24 @@ public class PanettoneProject {
 			Object... args) throws CoreException {
 		URI projectPath = project.getLocationURI();
 		try {
-			File baseDir = new File(projectPath);
-			Constructor<?> constructor = type.getDeclaredConstructor(File.class);
-			Object compiler = constructor.newInstance(baseDir);
+			Object compiler = getCompiler(type, projectPath);
 			Method m = type.getDeclaredMethod(method, types);
 			return m.invoke(compiler, args);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID, "Unable to load compatible jar file!", e));
+		}
+	}
+
+	private Object getCompiler(Class<?> type, URI projectPath)
+			throws InstantiationException,
+			IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		File baseDir = new File(projectPath);
+		try {
+			Constructor<?> constructor= type.getDeclaredConstructor(File.class);
+			return  constructor.newInstance(baseDir);
+		} catch (NoSuchMethodException e) {
+			Constructor<?> constructor = type.getDeclaredConstructor(File.class, List.class);
+			return  constructor.newInstance(baseDir, new ArrayList<>());
 		}
 	}
 
@@ -89,6 +102,7 @@ public class PanettoneProject {
 			mkDirs(project.getFolder(TONE_OUTPUT));
 			prepareClasspath(TONE_OUTPUT);
 			prepareClasspath(COTTI_OUTPUT);
+			refresh(null);
 		} catch (Exception e) {
 			markAsDisabled();
 		}
@@ -115,6 +129,7 @@ public class PanettoneProject {
 
 	public void refresh(IProgressMonitor monitor) throws CoreException {
 		project.getFolder(TONE_OUTPUT).refreshLocal(DEPTH_INFINITE, monitor);
+		project.getFolder(COTTI_OUTPUT).refreshLocal(DEPTH_INFINITE, monitor);
 	}
 
 	private void addToClasspath(IJavaProject java, IPath srcPath)
@@ -132,7 +147,4 @@ public class PanettoneProject {
 		java.setRawClasspath(newEntries, null);
 	}
 
-	public File getBaseDir() {
-		return project.getFolder("").getLocation().toFile();
-	}
 }

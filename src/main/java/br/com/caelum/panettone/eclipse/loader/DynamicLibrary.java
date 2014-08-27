@@ -38,7 +38,8 @@ public class DynamicLibrary {
 	private Class<?> loadOrError(IProgressMonitor monitor)
 			throws CoreException {
 		try {
-			Optional<IFile> jar = findProjectPanettone();
+			String plugin = jarName().substring(jarName().indexOf("-")+1, jarName().lastIndexOf("-"));
+			Optional<IFile> jar = findJar(plugin);
 			IFile file = extractJar(monitor, jar);
 			URL url = file.getLocationURI().toURL();
 			ClassLoader parent = Builder.class.getClassLoader();
@@ -71,12 +72,12 @@ public class DynamicLibrary {
 
 	private String jarName() {
 		return repositoryJar
-				.substring(repositoryJar.indexOf("/") + 1);
+				.substring(repositoryJar.lastIndexOf("/") + 1);
 	}
 
-	private Optional<IFile> findProjectPanettone() throws CoreException {
+	private Optional<IFile> findJar(String name) throws CoreException {
 		IFolder folder = project.getFolder(PanettoneProject.SRC_BUILD_LIB);
-		JarFileLocator jarFinder = new JarFileLocator();
+		JarFileLocator jarFinder = new JarFileLocator(name);
 		folder.accept(jarFinder);
 		return jarFinder.getJar();
 	}

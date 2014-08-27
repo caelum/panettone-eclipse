@@ -47,6 +47,7 @@ public class PanettoneNature implements IProjectNature {
 
 
 	public void deconfigure() throws CoreException {
+		new ToneMarkers().clear(project);
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
 		for (int i = 0; i < commands.length; ++i) {
@@ -66,11 +67,6 @@ public class PanettoneNature implements IProjectNature {
 		return project;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
-	 */
 	public void setProject(IProject project) {
 		this.project = project;
 	}

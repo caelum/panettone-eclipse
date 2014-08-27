@@ -9,9 +9,15 @@ import org.eclipse.core.runtime.CoreException;
 
 class JarFileLocator implements IResourceVisitor {
 	private Optional<IFile> jar = Optional.empty();
+	
+	private final String plugin;
+
+	public JarFileLocator(String name) {
+		this.plugin = name;
+	}
 
 	public boolean visit(IResource resource) throws CoreException {
-		if (resource.getName().contains("vraptor-panettone")) {
+		if (resource.getName().contains("vraptor-" + plugin)) {
 			jar = Optional.of((IFile) resource);
 		}
 		return true;

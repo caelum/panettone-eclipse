@@ -24,11 +24,12 @@ public class Builder {
 	void full() throws CoreException {
 		clear();
 		project.accept(new VisitToners(this::compileTone));
-		compileCotti();
+		compileCotti(null);
 	}
 
 	void incremental(IResourceDelta delta) throws CoreException {
 		delta.accept(new DeltaVisitor(this::remove, this::compileTone));
+		delta.accept(new CottiVisitor(this::compileCotti));
 	}
 
 	private void clear() throws CoreException {
@@ -46,8 +47,8 @@ public class Builder {
 		ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
 	}
 
-	private void compileCotti() throws CoreException {
-		File basedir = tone.getBaseDir();
-		tone.invokeOnCotti("compile", new Class[]{File.class}, basedir); 
+	private void compileCotti(IFile file) throws CoreException {
+		File folder = project.getFolder(PanettoneProject.COTTI_INPUT).getLocation().toFile();
+		tone.invokeOnCotti("compile", new Class[]{File.class}, folder); 
 	}
 }
