@@ -1,4 +1,4 @@
-package br.com.caelum.panettone.eclipse;
+package br.com.caelum.panettone.eclipse.loader;
 
 import java.util.Optional;
 

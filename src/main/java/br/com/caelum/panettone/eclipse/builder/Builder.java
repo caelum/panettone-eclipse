@@ -42,7 +42,6 @@ public class Builder {
 	private void compile(IFile file) {
 		new ToneMarkers().removeMarkersFor(file);
 		PanettoneProject tone = new PanettoneProject(project);
-		if(!tone.isEnabled()) return;
 		try {
 			Optional<Exception> ex = (Optional<Exception>) tone.invokeOnCompiler("compile", new Class[]{File.class}, file.getLocation().toFile()); 
 			ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));

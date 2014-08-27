@@ -16,3 +16,7 @@ Use our update site:
 
 1. I want to use another panettone release
 Feel free to update it at `src/build/lib`
+
+
+PRE-RELEASE
+- doc: new expression language

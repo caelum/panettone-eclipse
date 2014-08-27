@@ -1,17 +1,12 @@
 package br.com.caelum.panettone.eclipse;
 
-import static java.util.Arrays.stream;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 
 import br.com.caelum.panettone.eclipse.builder.PanettoneBuilder;
 
@@ -28,12 +23,19 @@ public class PanettoneNature implements IProjectNature {
 		IProjectDescription desc = project.getDescription();
 		ICommand[] commands = desc.getBuildSpec();
 
-		for (int i = 0; i < commands.length; ++i) {
-			if (commands[i].getBuilderName().equals(PanettoneBuilder.BUILDER_ID)) {
-				return;
-			}
-		}
+		boolean alreadyThere = Arrays.stream(commands)
+				.map(c->c.getBuilderName())
+				.anyMatch(PanettoneBuilder.BUILDER_ID::equals);
+		if(alreadyThere) return;
 
+		addBuilder(desc, commands);
+		
+		PanettoneProject tone = new PanettoneProject(project);
+		tone.prepareFolders();
+	}
+
+	private void addBuilder(IProjectDescription desc, ICommand[] commands)
+			throws CoreException {
 		ICommand[] newCommands = new ICommand[commands.length + 1];
 		System.arraycopy(commands, 0, newCommands, 0, commands.length);
 		ICommand command = desc.newCommand();
@@ -41,33 +43,8 @@ public class PanettoneNature implements IProjectNature {
 		newCommands[newCommands.length - 1] = command;
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
-		
-		IJavaProject java = JavaCore.create(project);
-
-		PanettoneProject tone = new PanettoneProject(project);
-		try {
-			tone.prepareFolders();
-			if(tone.isEnabled()) {
-				IPath srcPath= java.getPath().append(tone.getViewOutput());
-				addToClasspath(java, srcPath);
-			}
-		} catch (Exception e) {
-			tone.markAsDisabled();
-		}
 	}
 
-	private void addToClasspath(IJavaProject java, IPath srcPath)
-			throws JavaModelException {
-		IClasspathEntry[] entries = java.getRawClasspath();
-		boolean isPresent = stream(entries).anyMatch(entry -> entry.getPath().equals(srcPath));
-		if(isPresent) return;
-		
-		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
-		System.arraycopy(entries, 0, newEntries, 0, entries.length);
-		IClasspathEntry srcEntry= JavaCore.newSourceEntry(srcPath, null);
-		newEntries[entries.length] = JavaCore.newSourceEntry(srcEntry.getPath());
-		java.setRawClasspath(newEntries, null);
-	}
 
 	public void deconfigure() throws CoreException {
 		IProjectDescription description = getProject().getDescription();

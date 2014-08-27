@@ -1,7 +1,5 @@
 package br.com.caelum.panettone.eclipse.builder;
 
-import static org.eclipse.core.resources.IResource.DEPTH_INFINITE;
-
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -31,8 +29,7 @@ public class PanettoneBuilder extends IncrementalProjectBuilder {
 				builder.incremental(delta);
 			}
 		}
-		getProject().getFolder(new PanettoneProject(getProject()).getViewOutput())
-				.refreshLocal(DEPTH_INFINITE, monitor);
+		new PanettoneProject(getProject()).refresh(monitor);
 		return null;
 	}
 

@@ -13,7 +13,7 @@ public class Tone {
 
 	static boolean onPath(IFile file) throws CoreException {
 		return file.getProjectRelativePath().toString()
-				.startsWith(new PanettoneProject(file.getProject()).getViewInput());
+				.startsWith(PanettoneProject.TONE_INPUT);
 	}
 
 	static boolean isToneExtension(IFile file) {
