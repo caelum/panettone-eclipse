@@ -23,11 +23,12 @@ public class Builder {
 	
 	void full() throws CoreException {
 		clear();
-		project.accept(new VisitToners(this::compile));
+		project.accept(new VisitToners(this::compileTone));
+		compileCutti();
 	}
 
 	void incremental(IResourceDelta delta) throws CoreException {
-		delta.accept(new DeltaVisitor(this::remove, this::compile));
+		delta.accept(new DeltaVisitor(this::remove, this::compileTone));
 	}
 
 	private void clear() throws CoreException {
@@ -39,14 +40,14 @@ public class Builder {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void compile(IFile file) {
+	private void compileTone(IFile file) throws CoreException {
 		new ToneMarkers().removeMarkersFor(file);
-		PanettoneProject tone = new PanettoneProject(project);
-		try {
-			Optional<Exception> ex = (Optional<Exception>) tone.invokeOnTone("compile", new Class[]{File.class}, file.getLocation().toFile()); 
-			ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
-		} catch (Exception e1) {
-			new ToneMarkers().addCompilationMarker(file, e1);
-		}
+		Optional<Exception> ex = (Optional<Exception>) tone.invokeOnTone("compile", new Class[]{File.class}, file.getLocation().toFile()); 
+		ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
+	}
+
+	private void compileCutti() throws CoreException {
+		File basedir = tone.getBaseDir();
+		tone.invokeOnCutti("compile", new Class[]{File.class}, basedir); 
 	}
 }

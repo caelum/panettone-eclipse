@@ -1,20 +1,15 @@
 package br.com.caelum.panettone.eclipse.builder;
 
-import java.util.function.Consumer;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
-interface CoreConsumer<T> {
-	void accept(T f) throws CoreException;
-}
 class DeltaVisitor implements IResourceDeltaVisitor {
 	private final CoreConsumer<IFile> remove;
-	private final Consumer<IFile> compile;
+	private final CoreConsumer<IFile> compile;
 
-	DeltaVisitor(CoreConsumer<IFile> remove, Consumer<IFile> compile) {
+	DeltaVisitor(CoreConsumer<IFile> remove, CoreConsumer<IFile> compile) {
 		this.remove = remove;
 		this.compile = compile;
 	}

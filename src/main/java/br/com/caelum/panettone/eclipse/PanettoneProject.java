@@ -68,7 +68,7 @@ public class PanettoneProject {
 			Method m = type.getDeclaredMethod(method, types);
 			return m.invoke(compiler, args);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID, "Unable to load panettone jar file!", e));
+			throw new CoreException(new Status(Status.ERROR, Activator.PLUGIN_ID, "Unable to load compatible jar file!", e));
 		}
 	}
 
@@ -130,5 +130,9 @@ public class PanettoneProject {
 		IClasspathEntry srcEntry= JavaCore.newSourceEntry(srcPath, null);
 		newEntries[entries.length] = JavaCore.newSourceEntry(srcEntry.getPath());
 		java.setRawClasspath(newEntries, null);
+	}
+
+	public File getBaseDir() {
+		return project.getFolder("").getLocation().toFile();
 	}
 }
