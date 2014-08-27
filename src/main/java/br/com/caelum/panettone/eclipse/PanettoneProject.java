@@ -29,33 +29,33 @@ public class PanettoneProject {
 	public static final String TONE_OUTPUT = "target/views-classes";
 	public static final String TONE_INPUT = "src/main/views";
 
-	public static final String CUTTI_OUTPUT = "target/i18n-classes";
-	public static final String CUTTI_INPUT = "src/main/resources";
+	public static final String COTTI_OUTPUT = "target/i18n-classes";
+	public static final String COTTI_INPUT = "src/main/resources";
 	
 	private static final String PANETTONE_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/1.0.0/vraptor-panettone-1.0.0.jar";
 	private static final String PANETTONE_TYPE = "br.com.caelum.vraptor.panettone.VRaptorCompiler";
 	public static final String SRC_BUILD_LIB = "src/build/lib";
 	
-	private static final String BISCUTTI_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/1.0.0/vraptor-panettone-1.0.0.jar";
-	private static final String BISCUTTI_TYPE = "br.com.caelum.vraptor.biscotti.compiler.Compiler";
+	private static final String BISCOTTI_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-biscotti/1.0.0/vraptor-biscotti-1.0.0.jar";
+	private static final String BISCOTTI_TYPE = "br.com.caelum.vraptor.biscotti.compiler.Compiler";
 
 	private final IProject project;
 	private final ToneMarkers markers = new ToneMarkers();
 	private final DynamicLibrary toneCooker;
-	private final DynamicLibrary cuttiCooker;
+	private final DynamicLibrary cottiCooker;
 
 	public PanettoneProject(IProject project) {
 		this.project = project;
 		this.toneCooker = new DynamicLibrary(project, PANETTONE_JAR, PANETTONE_TYPE);
-		this.cuttiCooker = new DynamicLibrary(project, BISCUTTI_JAR, BISCUTTI_TYPE);
+		this.cottiCooker = new DynamicLibrary(project, BISCOTTI_JAR, BISCOTTI_TYPE);
 	}
 
 	public Object invokeOnTone(String method, Class[] types, Object... args) throws CoreException {
 		return invoke(method, types, getTone(), args);
 	}
 
-	public Object invokeOnCutti(String method, Class[] types, Object... args) throws CoreException {
-		return invoke(method, types, getCutti(), args);
+	public Object invokeOnCotti(String method, Class[] types, Object... args) throws CoreException {
+		return invoke(method, types, getCotti(), args);
 	}
 
 	private Object invoke(String method, Class[] types, Class<?> type,
@@ -76,19 +76,19 @@ public class PanettoneProject {
 		return toneCooker.loadType(null);
 	}
 
-	private Class<?> getCutti() throws CoreException {
-		return cuttiCooker.loadType(null);
+	private Class<?> getCotti() throws CoreException {
+		return cottiCooker.loadType(null);
 	}
 
 	public void prepareFolders() {
 		try {
 			mkDirs(project.getFolder(SRC_BUILD_LIB));
-			mkDirs(project.getFolder(CUTTI_INPUT));
-			mkDirs(project.getFolder(CUTTI_OUTPUT));
+			mkDirs(project.getFolder(COTTI_INPUT));
+			mkDirs(project.getFolder(COTTI_OUTPUT));
 			mkDirs(project.getFolder(TONE_INPUT));
 			mkDirs(project.getFolder(TONE_OUTPUT));
 			prepareClasspath(TONE_OUTPUT);
-			prepareClasspath(CUTTI_OUTPUT);
+			prepareClasspath(COTTI_OUTPUT);
 		} catch (Exception e) {
 			markAsDisabled();
 		}

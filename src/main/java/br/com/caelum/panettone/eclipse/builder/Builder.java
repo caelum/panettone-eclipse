@@ -24,7 +24,7 @@ public class Builder {
 	void full() throws CoreException {
 		clear();
 		project.accept(new VisitToners(this::compileTone));
-		compileCutti();
+		compileCotti();
 	}
 
 	void incremental(IResourceDelta delta) throws CoreException {
@@ -46,8 +46,8 @@ public class Builder {
 		ex.ifPresent(e -> new ToneMarkers().addCompilationMarker(file, e));
 	}
 
-	private void compileCutti() throws CoreException {
+	private void compileCotti() throws CoreException {
 		File basedir = tone.getBaseDir();
-		tone.invokeOnCutti("compile", new Class[]{File.class}, basedir); 
+		tone.invokeOnCotti("compile", new Class[]{File.class}, basedir); 
 	}
 }
