@@ -22,13 +22,11 @@ public class Tone {
 	}
 
 	static boolean isToneExtension(IFile file) {
-		return file.getName().endsWith(".tone")
-				|| file.getName().contains(".tone.");
+		return Filenames.isTone(file.getName());
 	}
 
 	static boolean isCottiExtension(IFile file) {
-		return file.getName().endsWith(".properties")
-				|| file.getName().startsWith("messages.");
+		return Filenames.isCotti(file.getName());
 	}
 
 	static boolean isCotti(IFile file) throws CoreException {
