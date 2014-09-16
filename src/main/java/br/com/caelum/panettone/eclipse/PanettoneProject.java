@@ -3,6 +3,7 @@ package br.com.caelum.panettone.eclipse;
 import static java.util.Arrays.stream;
 import static org.eclipse.core.resources.IResource.DEPTH_INFINITE;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -28,6 +30,7 @@ import br.com.caelum.panettone.eclipse.loader.DynamicLibrary;
 @SuppressWarnings({ "rawtypes" })
 public class PanettoneProject {
 
+	private static final String TONE_DEFAULTS = "src/main/views/tone.defaults";
 	public static final String TONE_OUTPUT = "target/view-classes";
 	public static final String TONE_INPUT = "src/main/views";
 
@@ -102,9 +105,18 @@ public class PanettoneProject {
 			mkDirs(project.getFolder(TONE_OUTPUT));
 			prepareClasspath(TONE_OUTPUT);
 			prepareClasspath(COTTI_OUTPUT);
+			createFile(TONE_DEFAULTS);
 			refresh(null);
 		} catch (Exception e) {
 			markAsDisabled();
+		}
+	}
+
+	private void createFile(String filePath) throws CoreException {
+		IFile file = project.getFile(filePath);
+		if (!file.exists()) {
+			ByteArrayInputStream is = new ByteArrayInputStream("".getBytes());
+			file.create(is, IFile.FORCE, null);
 		}
 	}
 
