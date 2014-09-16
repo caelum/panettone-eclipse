@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
 import br.com.caelum.panettone.eclipse.Activator;
-import br.com.caelum.panettone.eclipse.PanettoneProject;
+import br.com.caelum.panettone.eclipse.VRaptorProject;
 import br.com.caelum.panettone.eclipse.ToneMarkers;
-import br.com.caelum.panettone.eclipse.builder.panettone.Builder;
+import br.com.caelum.panettone.eclipse.builder.Build;
 
 public class DynamicLibrary {
 
@@ -42,7 +42,7 @@ public class DynamicLibrary {
 			Optional<IFile> jar = findJar(plugin);
 			IFile file = extractJar(monitor, jar);
 			URL url = file.getLocationURI().toURL();
-			ClassLoader parent = Builder.class.getClassLoader();
+			ClassLoader parent = Build.class.getClassLoader();
 			URLClassLoader loader = new URLClassLoader(new URL[] { url },
 					parent);
 			return (Class<?>) loader.loadClass(mainType);
@@ -59,7 +59,7 @@ public class DynamicLibrary {
 
 	private IFile downloadJarFile(IProgressMonitor monitor) throws CoreException, IOException {
 		URL website = new URL(repositoryJar);
-		IFolder folder = project.getFolder(PanettoneProject.SRC_BUILD_LIB);
+		IFolder folder = project.getFolder(VRaptorProject.SRC_BUILD_LIB);
 		IFile file = folder.getFile(jarName());
 		if (file.exists()) {
 			file.setContents(website.openStream(), IFile.KEEP_HISTORY
@@ -76,7 +76,7 @@ public class DynamicLibrary {
 	}
 
 	private Optional<IFile> findJar(String name) throws CoreException {
-		IFolder folder = project.getFolder(PanettoneProject.SRC_BUILD_LIB);
+		IFolder folder = project.getFolder(VRaptorProject.SRC_BUILD_LIB);
 		JarFileLocator jarFinder = new JarFileLocator(name);
 		folder.accept(jarFinder);
 		return jarFinder.getJar();

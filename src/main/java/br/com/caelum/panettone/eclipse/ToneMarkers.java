@@ -53,7 +53,7 @@ public class ToneMarkers {
 
 	public void markAsDisabled(IProject project) {
 		clear(project);
-		add(project, "Unable to find panettone at " + PanettoneProject.SRC_BUILD_LIB, IMarker.SEVERITY_ERROR);
+		add(project, "Unable to find panettone at " + VRaptorProject.SRC_BUILD_LIB, IMarker.SEVERITY_ERROR);
 	}
 
 }

@@ -3,7 +3,7 @@ package br.com.caelum.panettone.eclipse.builder.panettone;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import br.com.caelum.panettone.eclipse.PanettoneProject;
+import br.com.caelum.panettone.eclipse.VRaptorProject;
 import br.com.caelum.panettone.eclipse.builder.Filenames;
 
 public class Tone {
@@ -14,12 +14,12 @@ public class Tone {
 
 	static boolean onTonePath(IFile file) throws CoreException {
 		return file.getProjectRelativePath().toString()
-				.startsWith(PanettoneProject.TONE_INPUT);
+				.startsWith(VRaptorProject.TONE_INPUT);
 	}
 
 	static boolean onCottiPath(IFile file) throws CoreException {
 		return file.getProjectRelativePath().toString()
-				.startsWith(PanettoneProject.COTTI_INPUT);
+				.startsWith(VRaptorProject.COTTI_INPUT);
 	}
 
 	static boolean isToneExtension(IFile file) {

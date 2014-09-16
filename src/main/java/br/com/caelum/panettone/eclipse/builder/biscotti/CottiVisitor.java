@@ -1,9 +1,11 @@
-package br.com.caelum.panettone.eclipse.builder;
+package br.com.caelum.panettone.eclipse.builder.biscotti;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
+import br.com.caelum.panettone.eclipse.builder.CoreConsumer;
+import br.com.caelum.panettone.eclipse.builder.FileVisitor;
 import br.com.caelum.panettone.eclipse.builder.panettone.Tone;
 
 public class CottiVisitor extends FileVisitor {

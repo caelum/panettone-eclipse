@@ -1,6 +1,9 @@
 package br.com.caelum.panettone.eclipse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -8,6 +11,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
+import br.com.caelum.panettone.eclipse.builder.BiscottiBuilder;
 import br.com.caelum.panettone.eclipse.builder.PanettoneBuilder;
 
 public class PanettoneNature implements IProjectNature {
@@ -16,51 +20,39 @@ public class PanettoneNature implements IProjectNature {
 	 * ID of this project nature
 	 */
 	public static final String NATURE_ID = "panettone-eclipse.panettoneNature";
+	
+	private final static List<String> BUILDERS = Arrays.asList(PanettoneBuilder.BUILDER_ID, BiscottiBuilder.BUILDER_ID);
 
 	private IProject project;
 
 	public void configure() throws CoreException {
 		IProjectDescription desc = project.getDescription();
-		ICommand[] commands = desc.getBuildSpec();
-
-		boolean alreadyThere = Arrays.stream(commands)
-				.map(c->c.getBuilderName())
-				.anyMatch(PanettoneBuilder.BUILDER_ID::equals);
-		if(alreadyThere) return;
-
-		addBuilder(desc, commands);
-		
-		PanettoneProject tone = new PanettoneProject(project);
-		tone.prepareFolders();
-	}
-
-	private void addBuilder(IProjectDescription desc, ICommand[] commands)
-			throws CoreException {
-		ICommand[] newCommands = new ICommand[commands.length + 1];
-		System.arraycopy(commands, 0, newCommands, 0, commands.length);
-		ICommand command = desc.newCommand();
-		command.setBuilderName(PanettoneBuilder.BUILDER_ID);
-		newCommands[newCommands.length - 1] = command;
+		List<ICommand> commands = new ArrayList<>(Arrays.asList(desc.getBuildSpec()));
+		BUILDERS.stream()
+			.map(id -> createCommand(desc, id))
+			.forEach(commands::add);
+		ICommand[] newCommands = commands.toArray(new ICommand[commands.size()]);
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
-	}
 
+		VRaptorProject tone = new VRaptorProject(project);
+		tone.prepareFolders();
+	}
+	
+	private ICommand createCommand(IProjectDescription desc, String builderId) {
+		ICommand command = desc.newCommand();
+		command.setBuilderName(builderId);
+		return command;
+	}
 
 	public void deconfigure() throws CoreException {
 		new ToneMarkers().clear(project);
 		IProjectDescription description = getProject().getDescription();
-		ICommand[] commands = description.getBuildSpec();
-		for (int i = 0; i < commands.length; ++i) {
-			if (commands[i].getBuilderName().equals(PanettoneBuilder.BUILDER_ID)) {
-				ICommand[] newCommands = new ICommand[commands.length - 1];
-				System.arraycopy(commands, 0, newCommands, 0, i);
-				System.arraycopy(commands, i + 1, newCommands, i,
-						commands.length - i - 1);
-				description.setBuildSpec(newCommands);
-				project.setDescription(description, null);			
-				return;
-			}
-		}
+		ICommand[] commands = Stream.of(description.getBuildSpec())
+			.filter(command -> !BUILDERS.contains(command.getBuilderName()))
+			.toArray(n -> new ICommand[n]);
+		description.setBuildSpec(commands);
+		project.setDescription(description, null);			
 	}
 
 	public IProject getProject() {

@@ -28,7 +28,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import br.com.caelum.panettone.eclipse.loader.DynamicLibrary;
 
 @SuppressWarnings({ "rawtypes" })
-public class PanettoneProject {
+public class VRaptorProject {
 
 	private static final String TONE_DEFAULTS = "src/main/views/tone.defaults";
 	public static final String TONE_OUTPUT = "target/view-classes";
@@ -49,7 +49,7 @@ public class PanettoneProject {
 	private final DynamicLibrary toneCooker;
 	private final DynamicLibrary cottiCooker;
 
-	public PanettoneProject(IProject project) {
+	public VRaptorProject(IProject project) {
 		this.project = project;
 		this.toneCooker = new DynamicLibrary(project, PANETTONE_JAR, PANETTONE_TYPE);
 		this.cottiCooker = new DynamicLibrary(project, BISCOTTI_JAR, BISCOTTI_TYPE);

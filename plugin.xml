@@ -3,6 +3,17 @@
 <plugin>
 
    <extension
+         id="biscottiBuilder"
+         name="Biscotti Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="br.com.caelum.panettone.eclipse.builder.BiscottiBuilder">
+         </run>
+      </builder>
+   </extension>
+      <extension
          id="panettoneBuilder"
          name="Panettone Project Builder"
          point="org.eclipse.core.resources.builders">
@@ -24,6 +35,9 @@
       </runtime>
       <builder
             id="panettone-eclipse.panettoneBuilder">
+      </builder>
+      <builder
+            id="panettone-eclipse.biscottiBuilder">
       </builder>
    </extension>
    <extension
