@@ -1,9 +1,10 @@
-package br.com.caelum.panettone.eclipse.builder;
+package br.com.caelum.panettone.eclipse.builder.panettone;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import br.com.caelum.panettone.eclipse.PanettoneProject;
+import br.com.caelum.panettone.eclipse.builder.Filenames;
 
 public class Tone {
 
@@ -29,7 +30,7 @@ public class Tone {
 		return Filenames.isCotti(file.getName());
 	}
 
-	static boolean isCotti(IFile file) throws CoreException {
+	public static boolean isCotti(IFile file) throws CoreException {
 		return isCottiExtension(file) && onCottiPath(file);
 	}
 

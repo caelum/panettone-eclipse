@@ -2,40 +2,34 @@ package br.com.caelum.panettone.eclipse.builder;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
-class CottiVisitor implements IResourceDeltaVisitor {
+import br.com.caelum.panettone.eclipse.builder.panettone.Tone;
+
+public class CottiVisitor extends FileVisitor {
 	private final CoreConsumer<IFile> compile;
-	private boolean recompiled = false;
-	CottiVisitor(CoreConsumer<IFile> compile) {
+	public CottiVisitor(CoreConsumer<IFile> compile) {
 		this.compile = compile;
 	}
 
-	public boolean visit(IResourceDelta delta) throws CoreException {
-		if(recompiled) return true;
-		boolean notAFile = !(delta.getResource() instanceof IFile);
-		if (notAFile)
-			return true;
-		
-		IFile file = (IFile) delta.getResource();
+	public boolean visit(IFile file, int deltaKind) throws CoreException {
 		if (Tone.isCotti(file))
-			dealWith(delta, file);
+			return dealWith(deltaKind, file);
 		return true;
 	}
 
-	private void dealWith(IResourceDelta delta, IFile file) throws CoreException {
-		switch (delta.getKind()) {
+	private boolean dealWith(int deltaKind, IFile file) throws CoreException {
+		switch (deltaKind) {
 		case IResourceDelta.REMOVED:
 		case IResourceDelta.ADDED:
 		case IResourceDelta.CHANGED:
 			recompile(file);
-			break;
+			return false;
 		}
+		return true;
 	}
 
 	private void recompile(IFile file) throws CoreException {
-		recompiled = true;
 		compile.accept(file);
 	}
 }

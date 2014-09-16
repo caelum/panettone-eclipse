@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import br.com.caelum.panettone.eclipse.PanettoneProject;
+import br.com.caelum.panettone.eclipse.builder.panettone.Builder;
 
 public class PanettoneBuilder extends IncrementalProjectBuilder {
 

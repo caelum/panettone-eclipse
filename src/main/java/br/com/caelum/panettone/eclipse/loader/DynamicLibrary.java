@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Status;
 import br.com.caelum.panettone.eclipse.Activator;
 import br.com.caelum.panettone.eclipse.PanettoneProject;
 import br.com.caelum.panettone.eclipse.ToneMarkers;
-import br.com.caelum.panettone.eclipse.builder.Builder;
+import br.com.caelum.panettone.eclipse.builder.panettone.Builder;
 
 public class DynamicLibrary {
 

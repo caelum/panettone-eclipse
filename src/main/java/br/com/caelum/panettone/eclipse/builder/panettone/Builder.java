@@ -1,4 +1,4 @@
-package br.com.caelum.panettone.eclipse.builder;
+package br.com.caelum.panettone.eclipse.builder.panettone;
 
 import java.io.File;
 import java.util.Optional;
@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import br.com.caelum.panettone.eclipse.PanettoneProject;
 import br.com.caelum.panettone.eclipse.ToneMarkers;
+import br.com.caelum.panettone.eclipse.builder.CottiVisitor;
 
 public class Builder {
 
@@ -21,15 +22,21 @@ public class Builder {
 		this.tone = new PanettoneProject(project);
 	}
 	
-	void full() throws CoreException {
+	public void full() throws CoreException {
 		clear();
-		project.accept(new VisitToners(this::compileTone));
+		project.accept(new AllToneVisitors(this::compileTone));
 		compileCotti(null);
 	}
 
-	void incremental(IResourceDelta delta) throws CoreException {
-		delta.accept(new DeltaVisitor(this::remove, this::compileTone));
-		delta.accept(new CottiVisitor(this::compileCotti));
+	public void incremental(IResourceDelta delta) throws CoreException {
+		ToneDefaultVisitor defaults = new ToneDefaultVisitor();
+		delta.accept(defaults);
+		if(defaults.hasChanged()) {
+			full();
+		} else {
+			delta.accept(new ToneVisitor(this::remove, this::compileTone));
+			delta.accept(new CottiVisitor(this::compileCotti));
+		}
 	}
 
 	private void clear() throws CoreException {
