@@ -1,5 +1,7 @@
 package br.com.caelum.panettone.eclipse;
 
+import static java.util.Optional.of;
+
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -38,10 +40,10 @@ public class AddRemovePanettoneNatureHandler extends AbstractHandler {
 
 	private Optional<IProject> projectFor(Object element) {
 		if (element instanceof IProject) {
-			return Optional.of((IProject) element);
+			return of((IProject) element);
 		}
 		if (element instanceof IAdaptable) {
-			return Optional.of((IProject) ((IAdaptable) element)
+			return of((IProject) ((IAdaptable) element)
 					.getAdapter(IProject.class));
 		}
 		return null;

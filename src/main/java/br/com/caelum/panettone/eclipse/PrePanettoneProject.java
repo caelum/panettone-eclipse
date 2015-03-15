@@ -1,5 +1,7 @@
 package br.com.caelum.panettone.eclipse;
 
+import static java.util.Arrays.stream;
+
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IProject;
@@ -37,16 +39,24 @@ public class PrePanettoneProject {
 	}
 
 	private String[] addNatureTo(String[] natures) {
-		String[] newNatures = new String[natures.length + 1];
-		System.arraycopy(natures, 0, newNatures, 0, natures.length);
+		String[] newNatures = copyArrayWithOneExtraSpace(natures);
 		newNatures[natures.length] = PanettoneNature.NATURE_ID;
 		return newNatures;
 	}
 
+	private String[] copyArrayWithOneExtraSpace(String[] origin) {
+		String[] target = new String[origin.length + 1];
+		System.arraycopy(origin, 0, target, 0, origin.length);
+		return target;
+	}
+
 	private String[] removeNatureFrom(String[] natures) {
-		String[] newNatures = Arrays.stream(natures)
-				.filter(n -> !n.equals(PanettoneNature.NATURE_ID))
+		return stream(natures)
+				.filter(this::nonPanettone)
 				.toArray(String[]::new);
-		return newNatures;
+	}
+
+	private boolean nonPanettone(String n) {
+		return !n.equals(PanettoneNature.NATURE_ID);
 	}
 }
