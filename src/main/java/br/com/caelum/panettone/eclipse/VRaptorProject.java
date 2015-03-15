@@ -37,7 +37,7 @@ public class VRaptorProject {
 	public static final String COTTI_OUTPUT = "target/i18n-classes";
 	public static final String COTTI_INPUT = "src/main/resources";
 	
-	private static final String PANETTONE_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/4.0.0-RC3/vraptor-panettone-4.0.0-RC3.jar";
+	private static final String PANETTONE_JAR = "http://central.maven.org/maven2/br/com/caelum/vraptor/vraptor-panettone/4.1.0/vraptor-panettone-4.1.0.jar";
 	private static final String PANETTONE_TYPE = "br.com.caelum.vraptor.panettone.VRaptorCompiler";
 	public static final String SRC_BUILD_LIB = "src/build/lib";
 	
