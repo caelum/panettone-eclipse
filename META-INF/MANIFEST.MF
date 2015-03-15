@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Panettone Eclipse
 Bundle-SymbolicName: panettone-eclipse;singleton:=true
-Bundle-Version: 4.0.0.RC2
+Bundle-Version: 4.1.0
 Bundle-Activator: br.com.caelum.panettone.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

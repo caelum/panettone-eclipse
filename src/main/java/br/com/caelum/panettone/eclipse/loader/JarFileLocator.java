@@ -17,7 +17,7 @@ class JarFileLocator implements IResourceVisitor {
 	}
 
 	public boolean visit(IResource resource) throws CoreException {
-		if (resource.getName().contains("vraptor-" + plugin)) {
+		if (resource.getName().startsWith(plugin)) {
 			jar = Optional.of((IFile) resource);
 		}
 		return true;

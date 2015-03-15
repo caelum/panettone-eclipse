@@ -20,13 +20,13 @@ import br.com.caelum.panettone.eclipse.builder.Build;
 public class DynamicLibrary {
 
 	private final String mainType;
-	private final String repositoryJar;
+	private final RemoteJar jar;
 	private final ToneMarkers markers = new ToneMarkers();
 	private final IProject project;
 
 	public DynamicLibrary(IProject project, String repositoryJar, String mainType) {
 		this.project = project;
-		this.repositoryJar = repositoryJar;
+		this.jar = new RemoteJar(repositoryJar);
 		this.mainType = mainType;
 	}
 
@@ -38,7 +38,7 @@ public class DynamicLibrary {
 	private Class<?> loadOrError(IProgressMonitor monitor)
 			throws CoreException {
 		try {
-			String plugin = jarName().substring(jarName().indexOf("-")+1, jarName().lastIndexOf("-"));
+			String plugin = jar.getNameWithoutVersion();
 			Optional<IFile> jar = findJar(plugin);
 			IFile file = extractJar(monitor, jar);
 			URL url = file.getLocationURI().toURL();
@@ -58,9 +58,9 @@ public class DynamicLibrary {
 	}
 
 	private IFile downloadJarFile(IProgressMonitor monitor) throws CoreException, IOException {
-		URL website = new URL(repositoryJar);
+		URL website = jar.toURL();
 		IFolder folder = project.getFolder(VRaptorProject.SRC_BUILD_LIB);
-		IFile file = folder.getFile(jarName());
+		IFile file = folder.getFile(jar.getFullFilename());
 		if (file.exists()) {
 			file.setContents(website.openStream(), IFile.KEEP_HISTORY
 					| IFile.FORCE, monitor);
@@ -68,11 +68,6 @@ public class DynamicLibrary {
 			file.create(website.openStream(), IFile.FORCE, monitor);
 		}
 		return file;
-	}
-
-	private String jarName() {
-		return repositoryJar
-				.substring(repositoryJar.lastIndexOf("/") + 1);
 	}
 
 	private Optional<IFile> findJar(String name) throws CoreException {
